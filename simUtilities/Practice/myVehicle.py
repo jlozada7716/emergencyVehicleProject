@@ -41,7 +41,7 @@ class myVehicle:
     b = 1.67 # Desired Deceleration
     delta = 4 #
     vo = 45
-    length = 10
+    length = 5
     s0 = 2
     s1 = 0
     t = 1.6 # Safe Time Headway
@@ -96,9 +96,15 @@ class myVehicle:
             if self.leadingVehicle != None and np.mod(self.leadingVehicle.x - self.x, xSimDistance) < 60:  # implementing safety conditions and lane change if possible
                 self.updatePrevAttributes()
                 self.decceleration = 0.35
+                if self.id == 43:
+                    print("43")
                 approachingRate = self.speed - self.leadingVehicle.speed
                 bumper2bumper = np.mod(self.leadingVehicle.x - self.x, xSimDistance) - self.l
-                print("Vehicle id:", self.id, "headway: ", bumper2bumper)
+                if bumper2bumper < 0.5:
+                    print("LESS THAN 0.5 HEADWAY: ", bumper2bumper, " " , self.id)
+                if bumper2bumper < 0:
+                    print("LESS THAN 0 HEADWAY: ", bumper2bumper)
+                # print("Vehicle id:", self.id, "headway: ", bumper2bumper)
                 if self.speed == 0:
                     print("Stopped")
                 desiredMinimumGap = self.s0 + self.s1 * np.sqrt(self.speed / self.vo) + self.t * self.speed + (self.speed * approachingRate / (2 * np.sqrt(self.a * self.b)))
@@ -135,8 +141,10 @@ class myVehicle:
                 #     self.acceleration = self.acceleration + 0.1
                 self.speed = np.minimum(self.speed + self.acceleration, self.maxSpeed)
                 # if self.speed == self.maxSpeed:
+
+                # if self.speed == self.maxSpeed:
                 #     self.flip = True
-                self.speed = np.maximum(self.speed + self.acceleration, 0)
+                self.speed = np.maximum(self.speed, 0)
                 # if self.speed == 0:
                 #     self.flip = False
                 self.x = np.mod(self.speed + self.x, xSimDistance)  # advance

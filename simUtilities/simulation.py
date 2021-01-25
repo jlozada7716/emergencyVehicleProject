@@ -18,7 +18,9 @@ class simulation():
 		self.timeStep = 0
 
 	def step(self): #	will advance the simulation by one step
-		# print(self.timeStep)
+		print(self.timeStep)
+		if self.timeStep == 482:
+			print('pause')
 		self.timeStep = self.timeStep + 1
 		# 	print('current time: %d, stop time: %d'%(self.timeStep,self.stopTime))
 		if self.timeStep >= self.stopTime: 

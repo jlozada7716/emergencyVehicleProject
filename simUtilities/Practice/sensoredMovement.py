@@ -42,6 +42,7 @@ class sensoredMovement():
                                 if (value <= 0.03): # Normal Vehicles
                                     direction = self.laneToDirection(self.vehicleDict[vid].lane, lane)
                                     self.vehicleDict[vid].changeLane(direction)
+                                    self.acceleration = 0
                                     break
 
             elif self.vehicleDict[vid].vy == 0 and np.mod(self.vehicleDict[-1].x - self.vehicleDict[vid].x, 1000) > 500:   # Emergency Vehicle is in range
