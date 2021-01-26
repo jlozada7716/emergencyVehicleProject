@@ -198,7 +198,7 @@ def analyzeEmergencyResults():
 stopTime = 1400  # stop after 700 steps
 Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
 
-vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 115, 4, 0.15) # create a listener to add vehicles
+vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 115, 2, 0.15) # create a listener to add vehicles
 Simulation.stepListeners.append(vehicleAdder)
 
 # vehicleAdder = simUtilities.addGroupCar(Simulation.vehicleDict, Simulation.timeStep, 20, 2, 0.4)

@@ -31,25 +31,22 @@ class myVehicle:
     prevAccel = 0
     prevSpeed = 0
     prevX = 0
-    l = 1.3
-    m = 0.5
-    alpha = 13
-    deltaT = 1
+    # l = 1.3
+    # m = 0.5
+    # alpha = 13
+    # deltaT = 1
     flip = False
 
     a = 0.73 # Desired Acceleration
     b = 1.67 # Desired Deceleration
     delta = 4 #
     vo = 45
-    length = 5
+    length = 4
     s0 = 2
     s1 = 0
     t = 2 # Safe Time Headway
     firstSwitch = True
-
-
-
-
+    dt = 1
 
 
     def __init__(self, vehicleDict, id=None, lane=0, speed=0.2, vy=0):
@@ -93,23 +90,17 @@ class myVehicle:
             self.slowingDown = False
             self.updateLeadingVehicle() # Checks for lead vehicle change
             if self.leadingVehicle != None and np.mod(self.leadingVehicle.x - self.x, xSimDistance) < 60:  # implementing safety conditions and lane change if possible
-                self.decceleration = 0.35
                 approachingRate = self.speed - self.leadingVehicle.speed
-                bumper2bumper = np.mod(self.leadingVehicle.x - self.x, xSimDistance) - self.l
-                if bumper2bumper < 0.5:
-                    print("LESS THAN 0.5 HEADWAY: ", bumper2bumper, " " , self.id)
-                if bumper2bumper < 0:
-                    print("LESS THAN 0 HEADWAY: ", bumper2bumper)
-                # print("Vehicle id:", self.id, "headway: ", bumper2bumper)
+                bumper2bumper = np.mod(self.leadingVehicle.x - self.x, xSimDistance) - self.length
+                self.headwayChecker(bumper2bumper)
                 desiredMinimumGap = self.s0 + self.s1 * np.sqrt(self.speed / self.vo) + self.t * self.speed + (self.speed * approachingRate / (2 * np.sqrt(self.a * self.b)))
-                # desiredMinimumGap = np.maximum(desiredMinimumGap, 5)
+                if desiredMinimumGap < 5:
+                    desiredMinimumGap = np.maximum(desiredMinimumGap, 3)
+                    print("GAP GAP GAP GAP GAP")
+                    print("GAP GAP GAP GAP GAP")
                 self.acceleration = self.a * (1 - np.power(approachingRate / self.vo, self.delta) - np.power(desiredMinimumGap / bumper2bumper, 2))
                 self.acceleration = np.minimum(self.acceleration, self.a)
-                # self.acceleration = ((self.alpha * np.power(self.prevSpeed, self.m)) / np.power(
-                #     np.mod(self.leadingVehicle.prevX - 7 - self.prevX, xSimDistance), self.l)) * (
-                #                                 self.leadingVehicle.prevSpeed - self.prevSpeed)
-
-                if self.acceleration < 0: # DOUBLE CHECK FOR ERRORS
+                if self.acceleration < 0: # For Sensored-Movement
                     self.slowingDown = True
                 else:
                     self.slowingDown = False
@@ -122,8 +113,6 @@ class myVehicle:
                 self.acceleration = np.minimum(self.acceleration + 0.05, 0.75)
                 self.speed = np.minimum(self.speed + self.acceleration, self.maxSpeed)
                 self.speed = np.maximum(self.speed, 0)
-                if self.speed == self.maxSpeed:
-                    print("MAX SPEED ", self.id)
                 self.x = np.mod(self.x + self.prevSpeed + 0.5 * self.prevAccel, xSimDistance)  # advance
                 self.maxSpeed += np.random.normal(loc = 0, scale = 0.005)
                 self.updatePrevAttributes()
@@ -210,7 +199,8 @@ class myVehicle:
             else:
                 # speedRatioFollow = 1.5
                 return self.checkSafetyEmergencyLane(lead, follow)
-        if headwayLead > np.maximum(speedRatioLead * 15, 15) and headwayFollow > np.maximum(speedRatioFollow * 20, 20):
+        if headwayLead > np.maximum(speedRatioLead * 15, 15) and headwayFollow > np.maximum(speedRatioFollow * 20, 20)\
+                and follow.vy == 0:
             return True
         return False
 
@@ -258,13 +248,11 @@ class myVehicle:
 
     def updatePrevAttributes(self): # Updates the previous x, speed, and acceleration of the vehicle
         self.prevX = self.x
-        if self.speed - self.prevSpeed == 0:
-            self.prevAccel = 0
-        else:
-            self.prevAccel = self.acceleration
         self.prevSpeed = self.speed
         self.prevAccel = self.acceleration
 
-
-
-        print("YEET")
+    def headwayChecker(self, bumper2bumper): # DELETE LATER Meant for debugging
+        if bumper2bumper < 0.5:
+            print("LESS THAN 0.5 HEADWAY: ", bumper2bumper, " ", self.id)
+        if bumper2bumper < 0:
+            print("LESS THAN 0 HEADWAY: ", bumper2bumper)
