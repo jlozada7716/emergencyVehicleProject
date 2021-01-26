@@ -92,7 +92,7 @@ class addGroupCars():
             lane = self.threeLanePlacer()
             v = myVehicle(self.vehicleDict, vin, lane, speed, 0)
             self.vehicleDict[vin] = v
-            # print("Vehicles placed: ", vin)
+            print("Vehicles placed: ", vin)
         if vin == self.carNum - 1:
             print("Done Placing")
             self.donePlacing = True

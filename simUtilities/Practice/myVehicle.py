@@ -118,12 +118,12 @@ class myVehicle:
 
     def changeLane(self, direction):  # shifts the vehicle across a lane
         if (direction == 1):
-            shift = self.speed * 0.007
-            shift = np.maximum(shift, 0.06)
-            shift = np.minimum(shift, 0.05)
+            shift = self.speed * 0.02
+            shift = np.maximum(shift, 0.05)
+            shift = np.minimum(shift, 0.1)
         if (direction == 0):
-            shift = -self.speed * 0.007
-            shift = np.maximum(shift, -0.06)
+            shift = -self.speed * 0.02
+            shift = np.maximum(shift, -0.1)
             shift = np.minimum(shift, -0.05)
         self.vy = shift
         if (shift > 0): #to get new leading vehicle without changing lane of vehicle

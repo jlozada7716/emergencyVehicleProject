@@ -1,6 +1,7 @@
 import numpy as np
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import simUtilities  # load package
 import os, sys
 import time
@@ -11,13 +12,13 @@ np.random.seed(7)
 lanePlacement = .5 #Horizontal center of top and bottom lane
 from simUtilities.Practice.myVehicle import myVehicle
 
-class myBoomListener: 
+class myBoomListener:
 	vehicleDict = {}
-	
+
 	def __init__(self,vehicleDict):
 		self.vehicleDict = vehicleDict
-		 
-		
+
+
 	def step(self):
 		for vid in self.vehicleDict:
 			if self.vehicleDict[vid].y > 2.5 or self.vehicleDict[vid].y < -2.5:
@@ -198,7 +199,7 @@ def analyzeEmergencyResults():
 stopTime = 1400  # stop after 700 steps
 Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
 
-vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 115, 2, 0.15) # create a listener to add vehicles
+vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 10, 2, 0.15) # create a listener to add vehicles
 Simulation.stepListeners.append(vehicleAdder)
 
 # vehicleAdder = simUtilities.addGroupCar(Simulation.vehicleDict, Simulation.timeStep, 20, 2, 0.4)
@@ -237,7 +238,8 @@ rectangleBackround = plt.Rectangle((-15, -13), width = 30, height=26, fill = Tru
 # circleBackround = plt.Circle((0,0), 11.25, color='#333333', fill = True)
 # circleBackround2 = plt.Circle((0,0), 6.75, color='#7EC850', fill = True)
 
-
+def getImage(path):
+	return OffsetImage(plt.imread(path))
 
 def getModifiedVehicle():  # will advance the simulation by one step and yields the vehiclelist
 		while(Simulation.step()):
@@ -275,6 +277,8 @@ def update(frame):
 		# ydata.append(r*np.sin(theta))
 		xdata.append(v.x)
 		ydata.append(v.y)
+		# ab = AnnotationBbox(getImage('C:\Dev\emergencyVehicleProject\simUtilities\Practice\Car2.png', (v.x, v.y), frameon=False))
+		# ax.add_artist(ab)
 	ln.set_data(xdata, ydata)
 	return ln, ln1
 
