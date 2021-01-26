@@ -16,7 +16,7 @@ class addGroupCars():
     donePlacing = False
 
 
-    def __init__(self, vehicleDict, timeStep, carNum = 1, trafficDensity = 35, aggression = 3):
+    def __init__(self, vehicleDict, timeStep, carNum = 1, trafficDensity = 35, aggression = 0.15):
         self.vehicleDict = vehicleDict
         self.timeStep = timeStep
         self.carNum = carNum
