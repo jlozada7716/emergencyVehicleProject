@@ -7,7 +7,7 @@ import time
 # add package location to system path
 sys.path.append(os.path.join(os.sep, 'gitlab_repos', 'emergency_vehicle_cooperative_driving', 'pyscripts'))
 
-np.random.seed(5)
+np.random.seed(7)
 lanePlacement = .5 #Horizontal center of top and bottom lane
 from simUtilities.Practice.myVehicle import myVehicle
 

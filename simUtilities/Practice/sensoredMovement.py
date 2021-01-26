@@ -72,7 +72,7 @@ class sensoredMovement():
             # Catches vehicle from flying past lane change by calling isClose function
             if (self.vehicleDict[vid].vy != 0):
                 lane = self.vehicleDict[vid].lane
-                self.vehicleDict[vid].isClose(lane)
+                self.vehicleDict[vid].isClose()
 
         toc = time.time()
         # if (toc - tic) > 0.00001:

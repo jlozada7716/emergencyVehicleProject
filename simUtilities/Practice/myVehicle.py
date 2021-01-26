@@ -94,7 +94,7 @@ class myVehicle:
                 bumper2bumper = np.mod(self.leadingVehicle.x - self.x, xSimDistance) - self.length
                 self.headwayChecker(bumper2bumper)
                 desiredMinimumGap = self.s0 + self.s1 * np.sqrt(self.speed / self.vo) + self.t * self.speed + (self.speed * approachingRate / (2 * np.sqrt(self.a * self.b)))
-                if desiredMinimumGap < 5:
+                if desiredMinimumGap < 3:
                     desiredMinimumGap = np.maximum(desiredMinimumGap, 3)
                 self.acceleration = self.a * (1 - np.power(approachingRate / self.vo, self.delta) - np.power(desiredMinimumGap / bumper2bumper, 2))
                 self.acceleration = np.minimum(self.acceleration, self.a)
@@ -103,15 +103,15 @@ class myVehicle:
                 else:
                     self.slowingDown = False
                 # Changed self.accel to prevAccel and 2nd self.speed to prevSpeed (FIX IF NECESSARY)
-                self.speed = np.maximum(self.speed + self.prevAccel, 0)
+                self.speed = np.maximum(self.speed + self.prevAccel * self.dt, 0)
                 self.speed = np.minimum(self.speed, self.maxSpeed)
-                self.x = np.mod(np.maximum(self.x + self.prevSpeed + 0.5 * self.prevAccel, self.x), xSimDistance)
+                self.x = np.mod(np.maximum(self.x + self.prevSpeed + 0.5 * self.prevAccel * np.power(self.dt, 2), self.x), xSimDistance)
                 self.updatePrevAttributes()
             else:
-                self.acceleration = np.minimum(self.acceleration + 0.05, 0.75)
-                self.speed = np.minimum(self.speed + self.acceleration, self.maxSpeed)
+                self.acceleration = np.minimum(self.acceleration + 0.04, 0.75)
+                self.speed = np.minimum(self.speed + self.acceleration * self.dt, self.maxSpeed)
                 self.speed = np.maximum(self.speed, 0)
-                self.x = np.mod(self.x + self.prevSpeed + 0.5 * self.prevAccel, xSimDistance)  # advance
+                self.x = np.mod(self.x + self.prevSpeed + 0.5 * self.prevAccel * np.power(self.dt, 2), xSimDistance)  # advance
                 self.maxSpeed += np.random.normal(loc = 0, scale = 0.005)
                 self.updatePrevAttributes()
         self.y = self.vy + self.y
@@ -134,12 +134,15 @@ class myVehicle:
         self.lane = lane
         return True
 
-    def isClose(self, lane):    # Locks vehicle to lane when close (Unless leaving a lane)
-        if np.abs(self.y - lane) < (lanePlacement / 9):
-            self.lane = lane
-            self.y = lane
-            self.vy = 0 # Stop shifting lanes
-            self.leadingVehicle = self.getLeadingVehicle(lane)
+    def isClose(self):    # Locks vehicle to lane when close (Unless leaving a lane)
+        if self.vy > 0 and self.y >= self.lane - lanePlacement / 6:
+            self.vy = 0
+            self.y = self.lane
+            self.leadingVehicle = self.getLeadingVehicle(self.lane)
+        if self.vy < 0 and self.y <= self.lane + lanePlacement / 6 :
+            self.vy = 0
+            self.y = self.lane
+            self.leadingVehicle = self.getLeadingVehicle(self.lane)
 
     def getLeadingVehicle(self, targetLane):    #Determine vehicle in front
         leadingVehicle = None
