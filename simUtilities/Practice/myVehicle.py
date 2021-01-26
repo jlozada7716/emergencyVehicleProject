@@ -96,8 +96,6 @@ class myVehicle:
                 desiredMinimumGap = self.s0 + self.s1 * np.sqrt(self.speed / self.vo) + self.t * self.speed + (self.speed * approachingRate / (2 * np.sqrt(self.a * self.b)))
                 if desiredMinimumGap < 5:
                     desiredMinimumGap = np.maximum(desiredMinimumGap, 3)
-                    print("GAP GAP GAP GAP GAP")
-                    print("GAP GAP GAP GAP GAP")
                 self.acceleration = self.a * (1 - np.power(approachingRate / self.vo, self.delta) - np.power(desiredMinimumGap / bumper2bumper, 2))
                 self.acceleration = np.minimum(self.acceleration, self.a)
                 if self.acceleration < 0: # For Sensored-Movement
@@ -200,7 +198,14 @@ class myVehicle:
                 # speedRatioFollow = 1.5
                 return self.checkSafetyEmergencyLane(lead, follow)
         if headwayLead > np.maximum(speedRatioLead * 15, 15) and headwayFollow > np.maximum(speedRatioFollow * 20, 20)\
-                and follow.vy == 0:
+                and follow.vy == 0 and self.speed > 3:
+            if self.id == 32:
+                print("Pause")
+            return True
+        elif headwayLead > np.maximum(speedRatioLead * 15, 15) and headwayFollow > np.maximum(speedRatioFollow*50, 50)\
+            and follow.vy == 0:
+            if self.id == 32:
+                print("Pause")
             return True
         return False
 
@@ -252,7 +257,7 @@ class myVehicle:
         self.prevAccel = self.acceleration
 
     def headwayChecker(self, bumper2bumper): # DELETE LATER Meant for debugging
-        if bumper2bumper < 0.5:
-            print("LESS THAN 0.5 HEADWAY: ", bumper2bumper, " ", self.id)
         if bumper2bumper < 0:
+            print("LESS THAN 0.5 HEADWAY: ", bumper2bumper, " ", self.id)
+        if bumper2bumper < -3:
             print("LESS THAN 0 HEADWAY: ", bumper2bumper)
