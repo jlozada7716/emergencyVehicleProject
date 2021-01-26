@@ -10,7 +10,7 @@ from .smartAdvance import smartAdvance
 from .smartAdvanceNew import smartAdvanceNew
 from .addVehiclesForExample import addVehiclesForExample
 from simUtilities.Practice.myVehicle import myVehicle
-from simUtilities.Practice.addNCars import addNCars
+from simUtilities.Practice.randomCarPlacement import randomCarPlacement
 from simUtilities.Practice.sensoredMovement import sensoredMovement
 from simUtilities.Practice.emergencyActiveListener import emergencyActiveListener
 from simUtilities.Practice.emergencyLoopWatch import emergencyLoopWatch

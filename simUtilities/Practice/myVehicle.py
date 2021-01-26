@@ -59,7 +59,7 @@ class myVehicle:
         self.y = lane
         self.speed = speed
         self.prevSpeed = speed
-        self.maxSpeed = speed + 3.5
+        self.maxSpeed = speed + 4.5
         self.vy = vy
         self.leadingVehicle = self.getLeadingVehicle(targetLane=lane)
         self.targetSpeed = speed
@@ -202,13 +202,9 @@ class myVehicle:
                 return self.checkSafetyEmergencyLane(lead, follow)
         if headwayLead > np.maximum(speedRatioLead * 15, 15) and headwayFollow > np.maximum(speedRatioFollow * 20, 20)\
                 and follow.vy == 0 and self.speed > 3:
-            if self.id == 32:
-                print("Pause")
             return True
         elif headwayLead > np.maximum(speedRatioLead * 15, 15) and headwayFollow > np.maximum(speedRatioFollow*50, 50)\
             and follow.vy == 0:
-            if self.id == 32:
-                print("Pause")
             return True
         return False
 

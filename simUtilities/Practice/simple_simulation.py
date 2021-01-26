@@ -1,14 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from matplotlib.offsetbox import OffsetImage, AnnotationBbox
+# from matplotlib.offsetbox import OffsetImage, AnnotationBbox
 import simUtilities  # load package
 import os, sys
 import time
 # add package location to system path
 sys.path.append(os.path.join(os.sep, 'gitlab_repos', 'emergency_vehicle_cooperative_driving', 'pyscripts'))
 
-np.random.seed(7)
+np.random.seed(10)
 lanePlacement = .5 #Horizontal center of top and bottom lane
 from simUtilities.Practice.myVehicle import myVehicle
 
@@ -196,10 +196,10 @@ def analyzeEmergencyResults():
 # analyzeEmergencyResults()
 # analyzeAverageVehicleSpeed()
 
-stopTime = 1400  # stop after 700 steps
+stopTime = 1000  # stop after 700 steps
 Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
 
-vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 10, 2, 0.15) # create a listener to add vehicles
+vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 90, 2, 0.3) # create a listener to add vehicles
 Simulation.stepListeners.append(vehicleAdder)
 
 # vehicleAdder = simUtilities.addGroupCar(Simulation.vehicleDict, Simulation.timeStep, 20, 2, 0.4)
@@ -224,40 +224,40 @@ ln, = plt.plot([], [], 'ro', animated=True)
 ln1, = plt.plot([],[], 'bo', animated=True)
 
 
-plt.axhline(y=lanePlacement/2, color='w', linestyle='dashed')
-plt.axhline(y=-lanePlacement/2, color='w', linestyle='dashed')
-plt.axhline(y=lanePlacement*1.5, color='black', linestyle='solid')
-plt.axhline(y=-lanePlacement*1.5, color='black', linestyle='solid')
-rectangle = plt.Rectangle((0, -0.75), width=1000, height=1.5, fill=True, color='#333333')
-rectangleBackround = plt.Rectangle((0, -2), width = 1000, height=4, fill = True, color='#CCCCCC')
-rectangleBackround = plt.Rectangle((-15, -13), width = 30, height=26, fill = True, color='#CCCCCC')
-# circle1 = plt.Circle((0,0), 9.75, color='w', linestyle='dashed', fill=False)
-# circle2 = plt.Circle((0,0), 8.25, color='w', linestyle='dashed', fill=False)
-# circle3 = plt.Circle((0,0), 11.25, color='black', linestyle='solid', fill=False)
-# circle4 = plt.Circle((0,0), 6.75, color='black', linestyle='solid', fill=False)
-# circleBackround = plt.Circle((0,0), 11.25, color='#333333', fill = True)
-# circleBackround2 = plt.Circle((0,0), 6.75, color='#7EC850', fill = True)
+# plt.axhline(y=lanePlacement/2, color='w', linestyle='dashed')
+# plt.axhline(y=-lanePlacement/2, color='w', linestyle='dashed')
+# plt.axhline(y=lanePlacement*1.5, color='black', linestyle='solid')
+# plt.axhline(y=-lanePlacement*1.5, color='black', linestyle='solid')
+# rectangle = plt.Rectangle((0, -0.75), width=1000, height=1.5, fill=True, color='#333333')
+# rectangleBackround = plt.Rectangle((0, -2), width = 1000, height=4, fill = True, color='#CCCCCC')
+# rectangleBackround = plt.Rectangle((-15, -13), width = 30, height=26, fill = True, color='#CCCCCC')
+circle1 = plt.Circle((0,0), 9.75, color='w', linestyle='dashed', fill=False)
+circle2 = plt.Circle((0,0), 8.25, color='w', linestyle='dashed', fill=False)
+circle3 = plt.Circle((0,0), 11.25, color='black', linestyle='solid', fill=False)
+circle4 = plt.Circle((0,0), 6.75, color='black', linestyle='solid', fill=False)
+circleBackround = plt.Circle((0,0), 11.25, color='#333333', fill = True)
+circleBackround2 = plt.Circle((0,0), 6.75, color='#7EC850', fill = True)
 
-def getImage(path):
-	return OffsetImage(plt.imread(path))
+# def getImage(path):
+# 	return OffsetImage(plt.imread(path))
 
 def getModifiedVehicle():  # will advance the simulation by one step and yields the vehiclelist
 		while(Simulation.step()):
 			yield Simulation.vehicleDict
 
 def init():
-	# ax.set_xlim(-15, 15)
-	# ax.set_ylim(-13, 13)
-	ax.set_xlim(0, 1000)
-	ax.set_ylim(-2, 2)
-	ax.add_artist(rectangleBackround)
-	ax.add_artist(rectangle)
-	# ax.add_artist(circleBackround)
-	# ax.add_artist(circle1)
-	# ax.add_artist(circle2)
-	# ax.add_artist(circle3)
-	# ax.add_artist(circle4)
-	# ax.add_artist(circleBackround2)
+	ax.set_xlim(-15, 15)
+	ax.set_ylim(-13, 13)
+	# ax.set_xlim(0, 1000)
+	# ax.set_ylim(-2, 2)
+	# ax.add_artist(rectangleBackround)
+	# ax.add_artist(rectangle)
+	ax.add_artist(circleBackround)
+	ax.add_artist(circle1)
+	ax.add_artist(circle2)
+	ax.add_artist(circle3)
+	ax.add_artist(circle4)
+	ax.add_artist(circleBackround2)
 	return ln,
 
 def update(frame):
@@ -268,15 +268,15 @@ def update(frame):
 		r = v.y * 3 + 9
 		theta = np.radians(-v.x * 360 / 1000)
 		if vid == -1:
-			# sXdata.append(r*np.cos(theta))
-			# sYdata.append(r*np.sin(theta))
-			sXdata.append(v.x)
-			sYdata.append(v.y)
+			sXdata.append(r*np.cos(theta))
+			sYdata.append(r*np.sin(theta))
+			# sXdata.append(v.x)
+			# sYdata.append(v.y)
 			ln1.set_data(sXdata, sYdata)
-		# xdata.append(r*np.cos(theta))
-		# ydata.append(r*np.sin(theta))
-		xdata.append(v.x)
-		ydata.append(v.y)
+		xdata.append(r*np.cos(theta))
+		ydata.append(r*np.sin(theta))
+		# xdata.append(v.x)
+		# ydata.append(v.y)
 		# ab = AnnotationBbox(getImage('C:\Dev\emergencyVehicleProject\simUtilities\Practice\Car2.png', (v.x, v.y), frameon=False))
 		# ax.add_artist(ab)
 	ln.set_data(xdata, ydata)
