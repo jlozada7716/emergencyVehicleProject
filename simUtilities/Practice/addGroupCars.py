@@ -78,7 +78,7 @@ class addGroupCars():
         return lane
 
     def randomSpeed(self): # Outputs a random speed around a mean of 8.1 m/s
-        speed = np.random.normal(loc=8.1, scale=self.aggression)
+        speed = np.random.normal(loc=5.1, scale=self.aggression)
         speed = np.minimum(speed, 13)
         speed = np.maximum(speed, 4)
         return speed

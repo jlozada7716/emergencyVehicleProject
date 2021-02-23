@@ -15,6 +15,14 @@ class myVehicle:
     acceleration = 0
     decceleration = 0.1 # DELETE?
     vy = None
+    # Future Values
+    futureX = None
+    futureY = None
+    futureVX = None
+    futureVY = None
+    futureAX = None
+    futureAY = None
+
     leadingVehicle = None   # Calculates the vehicle in front in a desired lane
     followingVehicle = None # Calculates the vehicle behind in a desired lane
     distanceToLeadingVehicle = 0 # Leading Vehicle headway DELETE?
@@ -46,7 +54,7 @@ class myVehicle:
     s1 = 0
     t = 2 # Safe Time Headway
     firstSwitch = True
-    dt = 1
+    dt = 1 / 4
 
 
     def __init__(self, vehicleDict, id=None, lane=0, speed=0.2, vy=0):
@@ -59,7 +67,7 @@ class myVehicle:
         self.y = lane
         self.speed = speed
         self.prevSpeed = speed
-        self.maxSpeed = speed + 4.5
+        self.maxSpeed = speed + 2
         self.vy = vy
         self.leadingVehicle = self.getLeadingVehicle(targetLane=lane)
         self.targetSpeed = speed
@@ -89,32 +97,43 @@ class myVehicle:
         else:  # not in emergencyMode or return from Emergency Mode
             self.slowingDown = False
             self.updateLeadingVehicle() # Checks for lead vehicle change
-            if self.leadingVehicle != None and np.mod(self.leadingVehicle.x - self.x, xSimDistance) < 60:  # implementing safety conditions and lane change if possible
+            if self.leadingVehicle != None and np.mod(self.leadingVehicle.x - self.x, xSimDistance) < 80:  # implementing safety conditions and lane change if possible
                 approachingRate = self.speed - self.leadingVehicle.speed
                 bumper2bumper = np.mod(self.leadingVehicle.x - self.x, xSimDistance) - self.length
                 self.headwayChecker(bumper2bumper)
                 desiredMinimumGap = self.s0 + self.s1 * np.sqrt(self.speed / self.vo) + self.t * self.speed + (self.speed * approachingRate / (2 * np.sqrt(self.a * self.b)))
                 if desiredMinimumGap < 3:
                     desiredMinimumGap = np.maximum(desiredMinimumGap, 3)
-                self.acceleration = self.a * (1 - np.power(approachingRate / self.vo, self.delta) - np.power(desiredMinimumGap / bumper2bumper, 2))
-                self.acceleration = np.minimum(self.acceleration, self.a)
-                if self.acceleration < 0: # For Sensored-Movement
+                self.futureAX = self.a * (1 - np.power(approachingRate / self.vo, self.delta) - np.power(desiredMinimumGap / bumper2bumper, 2))
+                self.futureAX = np.minimum(self.acceleration, self.a)
+                if self.futureAX < 0: # For Sensored-Movement
                     self.slowingDown = True
                 else:
                     self.slowingDown = False
                 # Changed self.accel to prevAccel and 2nd self.speed to prevSpeed (FIX IF NECESSARY)
-                self.speed = np.maximum(self.speed + self.prevAccel * self.dt, 0)
-                self.speed = np.minimum(self.speed, self.maxSpeed)
-                self.x = np.mod(np.maximum(self.x + self.prevSpeed + 0.5 * self.prevAccel * np.power(self.dt, 2), self.x), xSimDistance)
-                self.updatePrevAttributes()
+                # self.futureVX = np.maximum(self.speed + self.prevAccel * self.dt, 0)
+                # self.futureVX = np.minimum(self.speed, self.maxSpeed)
+                # self.futureX = np.mod(np.maximum(self.x + self.prevSpeed + 0.5 * self.prevAccel * np.power(self.dt, 2), self.x), xSimDistance)
+                # self.updatePrevAttributes()
             else:
-                self.acceleration = np.minimum(self.acceleration + 0.04, 0.75)
-                self.speed = np.minimum(self.speed + self.acceleration * self.dt, self.maxSpeed)
-                self.speed = np.maximum(self.speed, 0)
-                self.x = np.mod(self.x + self.prevSpeed + 0.5 * self.prevAccel * np.power(self.dt, 2), xSimDistance)  # advance
+                self.futureAX = np.minimum(self.acceleration + 0.02, 0.75)
+                # self.futureVX = np.minimum(self.speed + self.acceleration * self.dt, self.maxSpeed)
+                # self.futureVX = np.maximum(self.speed, 0)
+                # self.futureX = np.mod(self.x + self.prevSpeed + 0.5 * self.prevAccel * np.power(self.dt, 2), xSimDistance)  # advance
                 self.maxSpeed += np.random.normal(loc = 0, scale = 0.005)
-                self.updatePrevAttributes()
-        self.y = self.vy + self.y
+                # self.updatePrevAttributes()
+        self.futureY = self.vy + self.y
+
+    def update(self):
+        self.updatePrevAttributes()
+        self.speed = np.maximum(self.speed + self.prevAccel * self.dt, 0)
+        self.speed = np.minimum(self.speed, self.maxSpeed)
+        self.x = np.mod(np.maximum(self.prevX + self.prevSpeed + 0.5 * self.prevAccel * np.power(self.dt, 2), self.x), xSimDistance)
+        self.acceleration = self.futureAX
+        # Y values (TO BE UPDATED FOR FUTURE)
+        self.y = self.futureY
+        if self.id == 8:
+            print("Vehicle ", self.id, " Speed in MPH: ", self.speed * 4 * 2.237)
 
     def changeLane(self, direction):  # shifts the vehicle across a lane
         if (direction == 1):

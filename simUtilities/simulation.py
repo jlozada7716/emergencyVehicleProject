@@ -35,6 +35,8 @@ class simulation():
 		for vid,v in self.vehicleDict.items(): 
 			if vid == -1: continue
 			v.advance()
+		for vid,v in self.vehicleDict.items():
+			v.update()
 		toc = time.time()
 		# if (toc - tic) > 0.00001:
 			# print('Advanced elapsed time: %f' % (toc - tic))
