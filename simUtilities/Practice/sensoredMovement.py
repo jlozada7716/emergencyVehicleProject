@@ -4,6 +4,7 @@ import time
 sys.path.append(os.path.join(os.sep, 'gitlab_repos', 'emergency_vehicle_cooperative_driving','pyscripts','simUtilities'))
 
 # from .myVehicle import myVehicle
+xSimDistance = 2000
 
 class sensoredMovement():
     vehicleDict = {}
@@ -45,7 +46,7 @@ class sensoredMovement():
                                     self.acceleration = 0
                                     break
 
-            elif self.vehicleDict[vid].vy == 0 and np.mod(self.vehicleDict[-1].x - self.vehicleDict[vid].x, 1000) > 500:   # Emergency Vehicle is in range
+            elif self.vehicleDict[vid].vy == 0 and np.mod(self.vehicleDict[-1].x - self.vehicleDict[vid].x, xSimDistance) > 500:   # Emergency Vehicle is in range
                 z = 1
                 selfLane = self.vehicleDict[vid].lane
                 if self.vehicleDict[-1].lane == selfLane and np.random.rand() < 0.2:   # Vehicle is in same lane as Emergency Vehicle

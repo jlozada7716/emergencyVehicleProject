@@ -8,9 +8,11 @@ import time
 # add package location to system path
 sys.path.append(os.path.join(os.sep, 'gitlab_repos', 'emergency_vehicle_cooperative_driving', 'pyscripts'))
 
-np.random.seed(10)
+np.random.seed(13)
 lanePlacement = .5 #Horizontal center of top and bottom lane
 from simUtilities.Practice.myVehicle import myVehicle
+
+xSimDistance = 2000
 
 class myBoomListener:
 	vehicleDict = {}
@@ -173,11 +175,11 @@ def analyzeEmergencyResults():
 					if eV.loopDone:
 						loopX = eV.loopX
 				if eV.loopX < 100 and loopX != -3000:
-					loopX = eV.loopX + 1000
+					loopX = eV.loopX + xSimDistance
 				# Each timeStep is one half second
 				# timeLoop = (loopX - eV.insertX) / ((eV.loopTime - eV.insertTime) * 2)
 				if (loopX != -3000):
-					timeLoop = (eV.loopTime - eV.insertTime) * 1000 / loopX
+					timeLoop = (eV.loopTime - eV.insertTime) * xSimDistance / loopX
 					iterationTimeList.append(timeLoop)
 				# out.write('%d,%f\n' % (iteration, timeLoop))
 			for i in iterationTimeList:
@@ -196,10 +198,10 @@ def analyzeEmergencyResults():
 # analyzeEmergencyResults()
 # analyzeAverageVehicleSpeed()
 
-stopTime = 1000  # stop after 700 steps
+stopTime = 2000  # stop after 700 steps
 Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
 
-vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 10, 3, 0.3) # create a listener to add vehicles
+vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 100, 6, 0.2) # create a listener to add vehicles
 Simulation.stepListeners.append(vehicleAdder)
 
 # vehicleAdder = simUtilities.addGroupCar(Simulation.vehicleDict, Simulation.timeStep, 20, 2, 0.4)
@@ -228,8 +230,8 @@ plt.axhline(y=lanePlacement/2, color='w', linestyle='dashed')
 plt.axhline(y=-lanePlacement/2, color='w', linestyle='dashed')
 plt.axhline(y=lanePlacement*1.5, color='black', linestyle='solid')
 plt.axhline(y=-lanePlacement*1.5, color='black', linestyle='solid')
-rectangle = plt.Rectangle((0, -0.75), width=1000, height=1.5, fill=True, color='#333333')
-rectangleBackround = plt.Rectangle((0, -2), width = 1000, height=4, fill = True, color='#CCCCCC')
+rectangle = plt.Rectangle((0, -0.75), width=xSimDistance, height=1.5, fill=True, color='#333333')
+rectangleBackround = plt.Rectangle((0, -2), width = xSimDistance, height=4, fill = True, color='#CCCCCC')
 rectangleBackround = plt.Rectangle((-15, -13), width = 30, height=26, fill = True, color='#CCCCCC')
 # circle1 = plt.Circle((0,0), 9.75, color='w', linestyle='dashed', fill=False)
 # circle2 = plt.Circle((0,0), 8.25, color='w', linestyle='dashed', fill=False)
@@ -248,7 +250,7 @@ def getModifiedVehicle():  # will advance the simulation by one step and yields 
 def init():
 	# ax.set_xlim(-15, 15)
 	# ax.set_ylim(-13, 13)
-	ax.set_xlim(0, 1000)
+	ax.set_xlim(0, xSimDistance+20)
 	ax.set_ylim(-2, 2)
 	ax.add_artist(rectangleBackround)
 	ax.add_artist(rectangle)
@@ -266,7 +268,7 @@ def update(frame):
 
 	for vid, v in frame.items(): #ITERATES THROUGH EACH VEHICLE IN THE DICT
 		r = v.y * 3 + 9
-		theta = np.radians(-v.x * 360 / 1000)
+		theta = np.radians(-v.x * 360 / xSimDistance)
 		if vid == -1:
 			# sXdata.append(r*np.cos(theta))
 			# sYdata.append(r*np.sin(theta))

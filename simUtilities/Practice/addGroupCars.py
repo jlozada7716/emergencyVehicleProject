@@ -5,6 +5,8 @@ sys.path.append(os.path.join(os.sep, 'gitlab_repos', 'emergency_vehicle_cooperat
 from simUtilities.Practice.myVehicle import myVehicle
 
 lanePlacement = 0.5
+xSimDistance = 2000
+
 
 class addGroupCars():
     vehicleDict = {}
@@ -39,7 +41,7 @@ class addGroupCars():
     def safeToPlace(self):
         if len(self.vehicleDict) > 10:
             for i in range(0, 5):
-               if (self.vehicleDict[i].x >= 988):
+               if (self.vehicleDict[i].x >= xSimDistance * 0.95):
                   return False
         return True
 
@@ -78,9 +80,9 @@ class addGroupCars():
         return lane
 
     def randomSpeed(self): # Outputs a random speed around a mean of 8.1 m/s
-        speed = np.random.normal(loc=5.1, scale=self.aggression)
-        speed = np.minimum(speed, 13)
-        speed = np.maximum(speed, 4)
+        speed = np.random.normal(loc=3.3, scale=self.aggression)
+        speed = np.minimum(speed, 6)
+        speed = np.maximum(speed, 3)
         return speed
 
     def placeCar(self): # Places a single car and checks if the cars are done being placed
