@@ -8,7 +8,7 @@ import time
 # add package location to system path
 sys.path.append(os.path.join(os.sep, 'gitlab_repos', 'emergency_vehicle_cooperative_driving', 'pyscripts'))
 
-np.random.seed(13)
+np.random.seed(15)
 lanePlacement = .5 #Horizontal center of top and bottom lane
 from simUtilities.Practice.myVehicle import myVehicle
 
@@ -201,7 +201,7 @@ def analyzeEmergencyResults():
 stopTime = 2000  # stop after 700 steps
 Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
 
-vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 100, 6, 0.2) # create a listener to add vehicles
+vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 60, 6, 0.2) # create a listener to add vehicles
 Simulation.stepListeners.append(vehicleAdder)
 
 # vehicleAdder = simUtilities.addGroupCar(Simulation.vehicleDict, Simulation.timeStep, 20, 2, 0.4)

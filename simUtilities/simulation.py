@@ -19,7 +19,7 @@ class simulation():
 
 	def step(self): #	will advance the simulation by one step
 		print(self.timeStep)
-		if self.timeStep == 200:
+		if self.timeStep == 1:
 			print('pause')
 		self.timeStep = self.timeStep + 1
 		# 	print('current time: %d, stop time: %d'%(self.timeStep,self.stopTime))

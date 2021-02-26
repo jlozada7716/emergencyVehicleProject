@@ -14,8 +14,13 @@ class addGroupCars():
     aggression = 0
     timeStep = 0
     prevLane = 0
+    carNum = None
     safePlacement = True
     donePlacing = False
+    start = False
+    lane1 = []
+    lane2 = []
+    lane3 = []
 
 
     def __init__(self, vehicleDict, timeStep, carNum = 1, trafficDensity = 35, aggression = 0.15):
@@ -24,19 +29,46 @@ class addGroupCars():
         self.carNum = carNum
         self.trafficDensity = trafficDensity
         self.aggression = aggression
+        for x in range(0, xSimDistance, 20):
+            self.lane1.append(x)
+            self.lane2.append(x)
+            self.lane3.append(x)
 
     def step(self):
-        self.timeStep += 1
-        if self.timeStep == 200 and not self.donePlacing:
-            for i in range(0, 50): # In case the cars weren't all placed in time
-                print("Didn't Finish")
-        if self.safePlacement == True:
-            self.safePlacement = self.safeToPlace()
-        if self.timeStep % self.trafficDensity == 0 and self.safePlacement:		#Create vehicle every 15 timeSteps
-            self.placeCar()
-            self.placeCar()
-            self.placeCar()
+        self.randomPlace()
+        # self.timeStep += 1
+        # if self.timeStep == 400 and not self.donePlacing:
+        #     for i in range(0, 50): # In case the cars weren't all placed in time
+        #         print("Didn't Finish")
+        # if self.safePlacement == True:
+        #     self.safePlacement = self.safeToPlace()
+        # if self.timeStep % self.trafficDensity == 0 and self.safePlacement:		#Create vehicle every 15 timeSteps
+        #     self.placeCar()
+        #     self.placeCar()
+        #     self.placeCar()
         return True
+
+    def randomPlace(self):
+        if not self.start:
+            for i in range(0, self.carNum):
+                lane = np.random.randint(1, 4)
+                if lane == 1 and len(self.lane1) > 0:
+                    position = np.random.randint(0, len(self.lane1))
+                    position = self.lane1.pop(position)
+                    self.specificCarPlace(position, lanePlacement)
+                elif lane == 2 and len(self.lane2) > 0:
+                    position = np.random.randint(0, len(self.lane2))
+                    position = self.lane2.pop(position)
+                    self.specificCarPlace(position, 0)
+                elif len(self.lane3) > 0:
+                    position = np.random.randint(0, len(self.lane3))
+                    position = self.lane3.pop(position)
+                    self.specificCarPlace(position, -lanePlacement)
+                else:
+                    i = i - 1
+                    print("Didn't Finish")
+            self.start = True
+
 
     def safeToPlace(self):
         if len(self.vehicleDict) > 10:
@@ -85,6 +117,20 @@ class addGroupCars():
         speed = np.maximum(speed, 3)
         return speed
 
+
+    def specificCarPlace(self, x, lane): # Places a single car and checks if the cars are done being placed
+        vin = len(self.vehicleDict) + 1
+        if (vin > 0):
+            vin -= 1
+        if vin <= self.carNum - 1:  # Limits it to carNum amount of cars
+            speed = self.randomSpeed()
+            v = myVehicle(self.vehicleDict, vin, lane, speed, 0, x)
+            self.vehicleDict[vin] = v
+            print("Vehicles placed: ", vin)
+        if vin == self.carNum - 1:
+            print("Done Placing")
+            self.donePlacing = True
+
     def placeCar(self): # Places a single car and checks if the cars are done being placed
         vin = len(self.vehicleDict) + 1
         if (vin > 0):
@@ -92,7 +138,7 @@ class addGroupCars():
         if vin <= self.carNum - 1:  # Limits it to carNum amount of cars
             speed = self.randomSpeed()
             lane = self.threeLanePlacer()
-            v = myVehicle(self.vehicleDict, vin, lane, speed, 0)
+            v = myVehicle(self.vehicleDict, vin, lane, speed, 0, 0)
             self.vehicleDict[vin] = v
             print("Vehicles placed: ", vin)
         if vin == self.carNum - 1:

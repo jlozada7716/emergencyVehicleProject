@@ -51,7 +51,7 @@ class myVehicle:
     dt = 1 / 5  # Scan Interval
 
 
-    def __init__(self, vehicleDict, id=None, lane=0, speed=0.2, vy=0):
+    def __init__(self, vehicleDict, id=None, lane=0, speed=0.2, vy=0, x=0):
         if (id == None):
             self.id = len(vehicleDict) + 1
         else:
@@ -59,6 +59,7 @@ class myVehicle:
         self.vehicleDict = vehicleDict
         self.lane = lane
         self.y = lane
+        self.x = x
         self.speed = speed
         self.prevSpeed = speed
         self.futureAX = 0
@@ -100,6 +101,8 @@ class myVehicle:
                 # Determine whether vehicle is slowing down or not
                 self.slowingDownTest()
             else: # No leading vehicle (Accelerate to max speed)
+                if self.speed == 0:
+                    self.futureAX = 0
                 self.futureAX = np.minimum(self.futureAX + 0.02, self.a)
                 self.maxSpeed += np.random.normal(loc = 0, scale = 0.005)
         self.futureY = self.vy + self.y # Update the y value
@@ -196,8 +199,19 @@ class myVehicle:
             followingVehicle = followVehicleLoop
         return followingVehicle
 
+    def getHeadway(self, lead, follow):
+        return np.mod(lead.x - follow.x, xSimDistance) - self.length
+
     def checkSafety(self, lead, follow):
-        if self.carFollowingModelSafety(lead, self) < 0 or self.carFollowingModelSafety(self, follow) < 0:
+        # if self.id == 93:
+        #     print()
+        #     w1 = self.carFollowingModelSafety(lead, self)
+        #     w2 = self.carFollowingModelSafety(self, follow)
+        #     w3 = lead.speed
+        #     w4 = self.getHeadway(lead, self)
+        #     w6 = self.getHeadway(self, follow)
+        if (self.carFollowingModelSafety(lead, self) <= 0 or self.carFollowingModelSafety(self, follow) < 0)\
+                or (lead.speed <= 0.5 and self.getHeadway(lead, self) <= 15) or self.getHeadway(self, follow) <= 15 or self.getHeadway(lead, self) <= 15:
             return False
         else:
             return True
@@ -239,5 +253,5 @@ class myVehicle:
             self.slowingDown = False
 
     def headwayChecker(self, bumper2bumper): # DELETE LATER Meant for debugging
-        if bumper2bumper + 3 < 0:
+        if bumper2bumper + 3 < 0 and self.y == self.leadingVehicle.y:
             print("HEADWAY WARNING: ", bumper2bumper, " ", self.id)

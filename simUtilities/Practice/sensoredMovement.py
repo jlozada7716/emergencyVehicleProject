@@ -40,7 +40,7 @@ class sensoredMovement():
                                     direction = self.laneToDirection(self.vehicleDict[vid].lane, lane)
                                     self.vehicleDict[vid].changeLane(direction)
                                     break
-                                if (value <= 0.03): # Normal Vehicles
+                                if (value <= 0.04): # Normal Vehicles
                                     direction = self.laneToDirection(self.vehicleDict[vid].lane, lane)
                                     self.vehicleDict[vid].changeLane(direction)
                                     self.acceleration = 0
