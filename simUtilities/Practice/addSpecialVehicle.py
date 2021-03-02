@@ -8,17 +8,10 @@ from simUtilities.simulation import simulation
 class addSpecialVehicle():
 	Simulation = None 
 	insertTime = 0
-	lanePlacement = 0
-	lane = 0
-	lanes = {}
 	
-	def __init__(self,Simulation, insertTime, lanePlacement = 1):
+	def __init__(self,Simulation, insertTime):
 		self.Simulation = Simulation 
 		self.insertTime = insertTime
-		self.lanePlacement = lanePlacement
-		self.lanes = {-lanePlacement, 0, lanePlacement}
-		lane = np.random.randint(0, 3)
-		lane = self.intToLane(lane)
 		
 	def step(self):
 		if self.Simulation.timeStep == self.insertTime and (-1 not in self.Simulation.vehicleDict):
@@ -27,18 +20,7 @@ class addSpecialVehicle():
 			v.id = -1
 			v.insertTime = self.Simulation.timeStep
 			v.insertX = v.x # Data Collector needs to be updated as vehicle doesn't spawn at 0
-			v.m = 0.1
-			v.l = 0.7
 			self.Simulation.vehicleDict[-1] = v
 			del self.Simulation.vehicleDict[vehicleToReplace]
 			print("Emergency Vehicle Spawned")
 		return True
-
-	def intToLane(self, lane): #Converts integer into lane value
-		if lane == 0:
-			lane = -self.lanePlacement
-		elif lane == 1:
-			lane = 0
-		else:
-			lane = self.lanePlacement
-		return lane

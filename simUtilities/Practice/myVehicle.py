@@ -14,7 +14,7 @@ class myVehicle:
     speed = 0
     maxSpeed = None
     acceleration = 0
-    decceleration = 0.1 # DELETE?
+    deceleration = 0 # DELETE?
     vy = None
     # Future Values
     futureY = None
@@ -71,31 +71,46 @@ class myVehicle:
     def advance(self):  # Calculates the acceleration values and makes necessary lane changes
         if self.emergencyResponse == False and np.abs(self.lane) == 2*lanePlacement\
                 and self.vy == 0 and np.random.rand() < 0.3: #For vehicles to get back in lane after emegResponse turns false
-            if self.checkSafety(self.getLeadingVehicle(self.lane+lanePlacement), self.getFollowingVehicle(self.lane+lanePlacement))\
-                    and self.lane == -2*lanePlacement:
-                self.changeLane(1)
-            elif self.checkSafety(self.getLeadingVehicle(self.lane-lanePlacement), self.getFollowingVehicle(self.lane-lanePlacement))\
-                    and self.lane == 2*lanePlacement:
-                self.changeLane(0)
+            # if self.checkSafety(self.getLeadingVehicle(self.lane+lanePlacement), self.getFollowingVehicle(self.lane+lanePlacement))\
+            #         and self.lane == -2*lanePlacement:
+            #     self.changeLane(1)
+            # elif self.checkSafety(self.getLeadingVehicle(self.lane-lanePlacement), self.getFollowingVehicle(self.lane-lanePlacement))\
+            #         and self.lane == 2*lanePlacement:
+            #     self.changeLane(0)
+            pass
         if self.emergencyResponse: # Emergency Vehicle has entered the simulation
             self.slowingDown = True
             self.updateLeadingVehicle()
-            self.decceleration = 0.35
             if self.leadingVehicle != None:
-                self.updatePrevAttributes()
-                # Find safe position to start braking in
-                self.slowSpeedFollowingBehavior()
-            if np.abs(self.y) >= 1.5*lanePlacement:
-                self.speed = np.maximum(self.speed - self.decceleration, 0)
-            elif self.lane != self.vehicleDict[-1]:
-                self.speed = np.maximum(self.speed - self.decceleration, 2)
-            self.x = np.mod(np.maximum(self.x + self.prevSpeed + 0.5 * self.prevAccel, self.x), xSimDistance)
+                self.futureAX = self.carFollowingModel(self.leadingVehicle, self, False)
+                if self.futureAX > 0:
+                    self.futureAX = 0
+            else:
+                self.futureAX = np.maximum(self.futureAX-0.03, self.b)
+
+            if self.speed != 1:
+                self.deceleration = np.maximum(self.deceleration - 0.2, -1*self.b)
+
+            self.emergencyUpdate()
+            # self.slowingDown = True
+            # self.updateLeadingVehicle()
+            # self.deceleration = 0.35
+            # if self.leadingVehicle != None:
+            #     self.updatePrevAttributes()
+            #     # Find safe position to start braking in
+            #     self.slowSpeedFollowingBehavior()
+            # if np.abs(self.y) >= 1.5*lanePlacement:
+            #     self.speed = np.maximum(self.speed - self.deceleration, 0)
+            # elif self.lane != self.vehicleDict[-1]:
+            #     self.speed = np.maximum(self.speed - self.deceleration, 2)
+            # self.x = np.mod(np.maximum(self.x + self.prevSpeed + 0.5 * self.prevAccel, self.x), xSimDistance)
         else:  # not in emergencyMode or return from Emergency Mode
             self.slowingDown = False
+            self.deceleration = 0
             self.updateLeadingVehicle() # Checks for lead vehicle change
             if self.leadingVehicle != None and np.mod(self.leadingVehicle.x - self.x, xSimDistance) < 80: # Car Following Model Activated
                 # Calculate Acceleration of Following Vehicle
-                self.futureAX = self.carFollowingModel()
+                self.futureAX = self.carFollowingModel(self.leadingVehicle, self, False)
                 # Ensure acceleration bounds
                 self.futureAX = np.minimum(self.futureAX, self.a)
                 # Determine whether vehicle is slowing down or not
@@ -103,7 +118,7 @@ class myVehicle:
             else: # No leading vehicle (Accelerate to max speed)
                 if self.speed == 0:
                     self.futureAX = 0
-                self.futureAX = np.minimum(self.futureAX + 0.02, self.a)
+                self.futureAX = np.minimum(self.futureAX + 0.02, self.a/5)
                 self.maxSpeed += np.random.normal(loc = 0, scale = 0.005)
         self.futureY = self.vy + self.y # Update the y value
 
@@ -116,19 +131,34 @@ class myVehicle:
         # Y values (TO BE UPDATED FOR FUTURE)
         self.y = self.futureY
 
-    def carFollowingModel(self):
-        approachingRate = self.speed - self.leadingVehicle.speed # Approaching rate of the following vehicle to the leading Vehicle
-        bumper2bumper = np.mod(self.leadingVehicle.x - self.x, xSimDistance) - self.length   # The headway between vehicles
-        self.headwayChecker(bumper2bumper)                                                   # Outputs warning if the headway is too small
-        desiredMinimumGap = self.s0 + (self.s1 * np.sqrt(self.speed / self.vo)) + (self.t * self.speed) + (self.speed * approachingRate / (2 * np.sqrt(self.a * self.b)))
-        if desiredMinimumGap < 3:
-            desiredMinimumGap = np.maximum(desiredMinimumGap, 4)
-        futureAX = self.a * (1 - np.power(approachingRate / self.vo, self.delta) - np.power(desiredMinimumGap / bumper2bumper, 2)) # Future Acceleration
-        return futureAX
+    def emergencyUpdate(self):
+        self.updatePrevAttributes()
+        if np.abs(self.y) >= 1.5 * lanePlacement:
+            self.speed = np.maximum(self.speed + self.prevAccel*self.dt + self.deceleration, 0)
+        else:
+            self.speed = np.maximum(self.speed + self.prevAccel*self.dt + self.deceleration, 2)
+        self.speed = np.minimum(self.speed, self.maxSpeed)
+        self.x = np.mod(np.maximum(self.prevX + self.prevSpeed + 0.5 * self.prevAccel * np.power(self.dt, 2), self.x), xSimDistance)
+        self.acceleration = self.futureAX
+        #Y values (TO BE UPDATED FOR FUTURE)
+        self.y = self.futureY
 
-    def carFollowingModelSafety(self, lead, follow):
+    # def carFollowingModel(self):
+    #     approachingRate = self.speed - self.leadingVehicle.speed # Approaching rate of the following vehicle to the leading Vehicle
+    #     bumper2bumper = np.mod(self.leadingVehicle.x - self.x, xSimDistance) - self.length   # The headway between vehicles
+    #
+    #     self.headwayChecker(bumper2bumper, self.id)                                                   # Outputs warning if the headway is too small
+    #     desiredMinimumGap = self.s0 + (self.s1 * np.sqrt(self.speed / self.vo)) + (self.t * self.speed) + (self.speed * approachingRate / (2 * np.sqrt(self.a * self.b)))
+    #     if desiredMinimumGap < 3:
+    #         desiredMinimumGap = np.maximum(desiredMinimumGap, 4)
+    #     futureAX = self.a * (1 - np.power(approachingRate / self.vo, self.delta) - np.power(desiredMinimumGap / bumper2bumper, 2)) # Future Acceleration
+    #     return futureAX
+
+    def carFollowingModel(self, lead, follow, changingLane):
         approachingRate = follow.speed - lead.speed # Approaching rate of the following vehicle to the leading Vehicle
         bumper2bumper = np.mod(lead.x - follow.x, xSimDistance) - follow.length   # The headway between vehicles
+        if not changingLane:
+            self.headwayChecker(bumper2bumper, follow.id)
         desiredMinimumGap = follow.s0 + (follow.s1 * np.sqrt(follow.speed / follow.vo)) + (follow.t * follow.speed) + (follow.speed * approachingRate / (2 * np.sqrt(follow.a * follow.b)))
         if desiredMinimumGap < 3:
             desiredMinimumGap = np.maximum(desiredMinimumGap, 4)
@@ -210,7 +240,7 @@ class myVehicle:
         #     w3 = lead.speed
         #     w4 = self.getHeadway(lead, self)
         #     w6 = self.getHeadway(self, follow)
-        if (self.carFollowingModelSafety(lead, self) <= 0 or self.carFollowingModelSafety(self, follow) < 0)\
+        if (self.carFollowingModel(lead, self, True) <= 0 or self.carFollowingModel(self, follow, True) < 0)\
                 or (lead.speed <= 0.5 and self.getHeadway(lead, self) <= 15) or self.getHeadway(self, follow) <= 15 or self.getHeadway(lead, self) <= 15:
             return False
         else:
@@ -252,6 +282,6 @@ class myVehicle:
         else:
             self.slowingDown = False
 
-    def headwayChecker(self, bumper2bumper): # DELETE LATER Meant for debugging
+    def headwayChecker(self, bumper2bumper, followID): # DELETE LATER Meant for debugging
         if bumper2bumper + 3 < 0 and self.y == self.leadingVehicle.y:
-            print("HEADWAY WARNING: ", bumper2bumper, " ", self.id)
+            print("HEADWAY WARNING: ", bumper2bumper, " ", followID)

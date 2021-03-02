@@ -40,54 +40,45 @@ class sensoredMovement():
                                     direction = self.laneToDirection(self.vehicleDict[vid].lane, lane)
                                     self.vehicleDict[vid].changeLane(direction)
                                     break
-                                if (value <= 0.04): # Normal Vehicles
+                                if (value <= 0.01): # Normal Vehicles
                                     direction = self.laneToDirection(self.vehicleDict[vid].lane, lane)
                                     self.vehicleDict[vid].changeLane(direction)
                                     self.acceleration = 0
                                     break
 
             elif self.vehicleDict[vid].vy == 0 and np.mod(self.vehicleDict[-1].x - self.vehicleDict[vid].x, xSimDistance) > 500:   # Emergency Vehicle is in range
-                z = 1
-                selfLane = self.vehicleDict[vid].lane
-                if self.vehicleDict[-1].lane == selfLane and np.random.rand() < 0.2:   # Vehicle is in same lane as Emergency Vehicle
-                    for lane in self.emergencyLanes:
-                        if np.abs(lane - selfLane) == self.lanePlacement:
-                            lead = self.vehicleDict[vid].getLeadingVehicle(lane)
-                            follow = self.vehicleDict[vid].getFollowingVehicle(lane)
-                            if self.vehicleDict[vid].checkSafety(lead, follow):
-                                direction = self.laneToDirection(selfLane, lane)
-                                self.vehicleDict[vid].changeLane(direction)
-                                break # to leave loop in this case
-                elif self.vehicleDict[-1].lane < selfLane and np.random.rand() < 0.2:  # Vehicle is in lane above Emergency Vehicle
-                    lead = self.vehicleDict[vid].getLeadingVehicle(selfLane+self.lanePlacement)
-                    follow = self.vehicleDict[vid].getFollowingVehicle(selfLane+self.lanePlacement)
-                    if selfLane != 2*self.lanePlacement and self.vehicleDict[vid].checkSafety(lead, follow):
-                        direction = self.laneToDirection(selfLane, selfLane+self.lanePlacement)
-                        self.vehicleDict[vid].changeLane(direction)
-                elif np.random.rand() < 0.2 and self.vehicleDict[-1].lane > selfLane:  # Vehicle is in lane below Emergency Vehicle
-                    lead = self.vehicleDict[vid].getLeadingVehicle(selfLane-self.lanePlacement)
-                    follow = self.vehicleDict[vid].getFollowingVehicle(selfLane-self.lanePlacement)
-                    if selfLane != -2*self.lanePlacement and self.vehicleDict[vid].checkSafety(lead, follow):
-                        direction = self.laneToDirection(selfLane, selfLane-self.lanePlacement)
-                        self.vehicleDict[vid].changeLane(direction)
+                # z = 1
+                # selfLane = self.vehicleDict[vid].lane
+                # if self.vehicleDict[-1].lane == selfLane and np.random.rand() < 0.2:   # Vehicle is in same lane as Emergency Vehicle
+                #     for lane in self.emergencyLanes:
+                #         if np.abs(lane - selfLane) == self.lanePlacement:
+                #             lead = self.vehicleDict[vid].getLeadingVehicle(lane)
+                #             follow = self.vehicleDict[vid].getFollowingVehicle(lane)
+                #             if self.vehicleDict[vid].checkSafety(lead, follow):
+                #                 direction = self.laneToDirection(selfLane, lane)
+                #                 self.vehicleDict[vid].changeLane(direction)
+                #                 break # to leave loop in this case
+                # elif self.vehicleDict[-1].lane < selfLane and np.random.rand() < 0.2:  # Vehicle is in lane above Emergency Vehicle
+                #     lead = self.vehicleDict[vid].getLeadingVehicle(selfLane+self.lanePlacement)
+                #     follow = self.vehicleDict[vid].getFollowingVehicle(selfLane+self.lanePlacement)
+                #     if selfLane != 2*self.lanePlacement and self.vehicleDict[vid].checkSafety(lead, follow):
+                #         direction = self.laneToDirection(selfLane, selfLane+self.lanePlacement)
+                #         self.vehicleDict[vid].changeLane(direction)
+                # elif np.random.rand() < 0.2 and self.vehicleDict[-1].lane > selfLane:  # Vehicle is in lane below Emergency Vehicle
+                #     lead = self.vehicleDict[vid].getLeadingVehicle(selfLane-self.lanePlacement)
+                #     follow = self.vehicleDict[vid].getFollowingVehicle(selfLane-self.lanePlacement)
+                #     if selfLane != -2*self.lanePlacement and self.vehicleDict[vid].checkSafety(lead, follow):
+                #         direction = self.laneToDirection(selfLane, selfLane-self.lanePlacement)
+                #         self.vehicleDict[vid].changeLane(direction)
+                pass
             # Catches vehicle from flying past lane change by calling isClose function
             if (self.vehicleDict[vid].vy != 0):
-                lane = self.vehicleDict[vid].lane
                 self.vehicleDict[vid].isClose()
 
         toc = time.time()
         # if (toc - tic) > 0.00001:
         #     print('Sensored elapsed time: %f' % (toc - tic))
         return True
-
-
-    # def directionBound(self, lane, direction):
-    #     if (lane == self.lanePlacement and direction == 1):
-    #         direction = 0
-    #     elif (lane == -self.lanePlacement and direction == 0):
-    #         direction = 1
-    #
-    #     return direction
 
     def laneToDirection(self, selfLane, leadLane): #0 is down 1 is up
         if selfLane > leadLane:

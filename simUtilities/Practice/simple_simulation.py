@@ -8,7 +8,7 @@ import time
 # add package location to system path
 sys.path.append(os.path.join(os.sep, 'gitlab_repos', 'emergency_vehicle_cooperative_driving', 'pyscripts'))
 
-np.random.seed(15)
+np.random.seed(16)
 lanePlacement = .5 #Horizontal center of top and bottom lane
 from simUtilities.Practice.myVehicle import myVehicle
 
@@ -44,41 +44,6 @@ class crashListener:
 					for i in range(0, 100000):
 						print("CRASH ")
 		return True
-
-class addCarsExp:
-    vehicleDict = {}
-    trafficDensity = 0
-    carNum = 0
-    timeStep = 0
-    def __init__(self, vehicleDict, timeStep, carNum, trafficDensity):
-        self.vehicleDict = vehicleDict
-        self.timeStep = timeStep
-        self.carNum = carNum
-        self.trafficDensity = trafficDensity
-
-    def step(self):
-        self.timeStep += 1
-        if self.timeStep % self.trafficDensity == 0:  # Create vehicle every 15 timeSteps
-            vin = len(self.vehicleDict) + 1
-            if (vin > 0):
-                vin -= 1
-            if vin <= self.carNum - 1:  # Limits it to carNum amount of cars
-                speed = np.random.normal(loc=8.2, scale=0.5)
-                speed = np.minimum(speed, 13)
-                speed = np.maximum(speed, 4)
-                print("Vehicle #", vin, " Speed: ", speed)
-                # if (vin == 0):
-                #     speed = 8
-                #     print(vin, " speed: ", speed)
-                # else:
-                #     speed = 11
-                #     print(vin, " speed: ", speed)
-                v = myVehicle(self.vehicleDict, vin, 0, speed, 0)
-                self.vehicleDict[vin] = v
-                # if vin == self.carNum - 1:
-                #     print("Done Placing")
-        return True
-
 
 def analyzeAverageVehicleSpeed():
 	tic = time.time()
@@ -152,7 +117,7 @@ def analyzeEmergencyResults():
 				vehicleAdder = simUtilities.addNCars(Simulation.vehicleDict, Simulation.timeStep, vehicles, 2, 0.3)  # create a listener to add vehicles
 				Simulation.stepListeners.append(vehicleAdder)
 
-				specialVehicleAdder = simUtilities.addSpecialVehicle(Simulation, insertTime, 0)
+				specialVehicleAdder = simUtilities.addSpecialVehicle(Simulation, insertTime)
 				Simulation.stepListeners.append(specialVehicleAdder)
 
 				visionLister = simUtilities.sensoredMovement(Simulation.vehicleDict, 50, lanePlacement, Simulation)  # new Dodge algorithm
@@ -194,27 +159,23 @@ def analyzeEmergencyResults():
 	print('elapsed time: %f' % (toc - tic))
 
 
-
 # analyzeEmergencyResults()
 # analyzeAverageVehicleSpeed()
 
-stopTime = 2000  # stop after 700 steps
+stopTime = 2500  # stop after 700 steps
 Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
 
-vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 60, 6, 0.2) # create a listener to add vehicles
+vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 150, 6, 0.2) # create a listener to add vehicles
 Simulation.stepListeners.append(vehicleAdder)
 
-# vehicleAdder = simUtilities.addGroupCar(Simulation.vehicleDict, Simulation.timeStep, 20, 2, 0.4)
-# Simulation.stepListeners.append(vehicleAdder)
-
-# specialVehicleAdder = simUtilities.addSpecialVehicle(Simulation, 200, 0)
-# Simulation.stepListeners.append(specialVehicleAdder)
+specialVehicleAdder = simUtilities.addSpecialVehicle(Simulation, 200)
+Simulation.stepListeners.append(specialVehicleAdder)
 
 visionLister = simUtilities.sensoredMovement(Simulation.vehicleDict, 50, lanePlacement, Simulation) # new Dodge algorithm
 Simulation.stepListeners.append(visionLister)	#add listener to your simulation
 
-# emergencyListener = simUtilities.emergencyActiveListener(Simulation.vehicleDict, 200)
-# Simulation.stepListeners.append(emergencyListener)
+emergencyListener = simUtilities.emergencyActiveListener(Simulation.vehicleDict, 500)
+Simulation.stepListeners.append(emergencyListener)
 
 boomLister = myBoomListener(Simulation.vehicleDict)  # create a listener
 Simulation.stepListeners.append(boomLister)  # add listener to your simulation
