@@ -18,8 +18,8 @@ class simulation():
 		self.timeStep = 0
 
 	def step(self): #	will advance the simulation by one step
-		print(self.timeStep)
-		if self.timeStep == 1:
+		# print(self.timeStep)
+		if self.timeStep == 0 or self.timeStep == 1:
 			print('pause')
 		self.timeStep = self.timeStep + 1
 		# 	print('current time: %d, stop time: %d'%(self.timeStep,self.stopTime))
@@ -36,7 +36,10 @@ class simulation():
 			if vid == -1: continue
 			v.advance()
 		for vid,v in self.vehicleDict.items():
-			v.update()
+			if v.emergencyResponse:
+				v.emergencyUpdate
+			else:
+				v.update()
 		toc = time.time()
 		# if (toc - tic) > 0.00001:
 			# print('Advanced elapsed time: %f' % (toc - tic))

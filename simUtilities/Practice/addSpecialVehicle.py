@@ -19,6 +19,7 @@ class addSpecialVehicle():
 			v = self.Simulation.vehicleDict[vehicleToReplace]
 			v.id = -1
 			v.insertTime = self.Simulation.timeStep
+			v.maxSpeed = v.maxSpeed + 1
 			v.insertX = v.x # Data Collector needs to be updated as vehicle doesn't spawn at 0
 			self.Simulation.vehicleDict[-1] = v
 			del self.Simulation.vehicleDict[vehicleToReplace]

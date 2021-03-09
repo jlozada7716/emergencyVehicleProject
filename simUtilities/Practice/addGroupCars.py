@@ -18,9 +18,9 @@ class addGroupCars():
     safePlacement = True
     donePlacing = False
     start = False
-    lane1 = []
-    lane2 = []
-    lane3 = []
+    lane1 = None
+    lane2 = None
+    lane3 = None
 
 
     def __init__(self, vehicleDict, timeStep, carNum = 1, trafficDensity = 35, aggression = 0.15):
@@ -29,6 +29,9 @@ class addGroupCars():
         self.carNum = carNum
         self.trafficDensity = trafficDensity
         self.aggression = aggression
+        self.lane1 = []
+        self.lane2 = []
+        self.lane3 = []
         for x in range(0, xSimDistance, 20):
             self.lane1.append(x)
             self.lane2.append(x)
@@ -36,16 +39,6 @@ class addGroupCars():
 
     def step(self):
         self.randomPlace()
-        # self.timeStep += 1
-        # if self.timeStep == 400 and not self.donePlacing:
-        #     for i in range(0, 50): # In case the cars weren't all placed in time
-        #         print("Didn't Finish")
-        # if self.safePlacement == True:
-        #     self.safePlacement = self.safeToPlace()
-        # if self.timeStep % self.trafficDensity == 0 and self.safePlacement:		#Create vehicle every 15 timeSteps
-        #     self.placeCar()
-        #     self.placeCar()
-        #     self.placeCar()
         return True
 
     def randomPlace(self):
@@ -63,6 +56,8 @@ class addGroupCars():
                 elif len(self.lane3) > 0:
                     position = np.random.randint(0, len(self.lane3))
                     position = self.lane3.pop(position)
+                    if i == 4 or i == 7:
+                        print(position)
                     self.specificCarPlace(position, -lanePlacement)
                 else:
                     i = i - 1
@@ -126,7 +121,7 @@ class addGroupCars():
             speed = self.randomSpeed()
             v = myVehicle(self.vehicleDict, vin, lane, speed, 0, x)
             self.vehicleDict[vin] = v
-            print("Vehicles placed: ", vin)
+            # print("Vehicles placed: ", vin)
         if vin == self.carNum - 1:
             print("Done Placing")
             self.donePlacing = True

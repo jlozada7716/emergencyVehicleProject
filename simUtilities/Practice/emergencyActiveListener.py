@@ -21,8 +21,6 @@ class emergencyActiveListener():
                                                                                                and np.mod(self.vehicleDict[-1].x - v.x, xSimDistance) > 0)) and vid != -1:
                     v.emergencyResponse = True
                 else:
-                    if v.emergencyResponse: # GET RID OF LATER
-                        pass # GET RID OF LATER
-                    else:
+                    if np.abs(v.lane) != 1:
                         v.emergencyResponse = False
         return True

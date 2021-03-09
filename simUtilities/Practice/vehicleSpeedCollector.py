@@ -11,7 +11,7 @@ class vehicleSpeedCollector():
         self.iterationSpeedList = iterationSpeedList
 
     def step(self):
-        if self.Simulation.timeStep > 1000 and self.Simulation.timeStep <= 1200:
+        if self.Simulation.timeStep > 1800 and self.Simulation.timeStep <= 2000:
             for vid, v in self.Simulation.vehicleDict.items():
                 self.iterationSpeedList.append(v.speed)
                 # print('Vehicle %s Speed: %f' % (vid, v.speed))

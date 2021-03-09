@@ -8,7 +8,7 @@ import time
 # add package location to system path
 sys.path.append(os.path.join(os.sep, 'gitlab_repos', 'emergency_vehicle_cooperative_driving', 'pyscripts'))
 
-np.random.seed(16)
+# np.random.seed(51001)
 lanePlacement = .5 #Horizontal center of top and bottom lane
 from simUtilities.Practice.myVehicle import myVehicle
 
@@ -37,11 +37,11 @@ class crashListener:
 			v = self.vehicleDict[vid]
 			follow = v.getFollowingVehicle(v.y)
 			if v.speed > 15:
-				for i in range(0, 100000):
+				for i in range(0, 10):
 					print("CRASH ")
 			if follow != None and follow.id != v.id:
 				if v.x == follow.x and v.y == follow.y:
-					for i in range(0, 100000):
+					for i in range(0, 10):
 						print("CRASH ")
 		return True
 
@@ -49,18 +49,19 @@ def analyzeAverageVehicleSpeed():
 	tic = time.time()
 	iterationSpeedList = []	# To collect average speed within a single iteration
 	iterationSpeedAverageList = []	# To collect average speed among many iterations
-	with open('AverageVehicleSpeedDataTrial7_100Iterations.csv', 'w') as out: #open file
+	with open('AverageSpeed_100Iterations1.csv', 'w') as out: #open file
 		for vehicles in range(30, 156, 5): #increment by 5
 			itShift = (vehicles - 20) * 100 # For seed
 			print('vehicleAmount #%d' % vehicles)
 			for iteration in range(0, 100):
 				print('iteration #%d' % iteration)
 				#perform Simulation
+				print("seed: ", iteration + itShift + 50000)
 				np.random.seed(seed=(iteration + itShift + 50000))
-				stopTime = 1250 # Data is only recorded from 1000 to 1200
+				stopTime = 2010 # Data is only recorded from 1800 - 2000
 				Simulation = simUtilities.simulation(stopTime=stopTime)  # starts the simulation
 
-				vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, vehicles, 2, 0.4)   # create a listener to add vehicles
+				vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, vehicles, 6, 0.2)   # create a listener to add vehicles
 				Simulation.stepListeners.append(vehicleAdder)
 
 				visionLister = simUtilities.sensoredMovement(Simulation.vehicleDict, 50, lanePlacement, Simulation)  # new Dodge algorithm
@@ -74,16 +75,14 @@ def analyzeAverageVehicleSpeed():
 
 				for i in range(Simulation.stopTime):
 					Simulation.step()
-
 				sum = 0
 				for i in iterationSpeedList:
 					sum += i
-				averageSpeed = sum / len(iterationSpeedList) # Average Speed of single iteration
+				averageSpeed = sum / len(iterationSpeedList)  # Average Speed of single iteration
 				print("Iteration ", iteration, "'s Average Speed: ", averageSpeed)
 				iterationSpeedAverageList.append(averageSpeed)
 				iterationSpeedList.clear()
 				sum = 0
-
 			averagesSum = 0
 			for i in iterationSpeedAverageList:
 				averagesSum += i
@@ -95,6 +94,9 @@ def analyzeAverageVehicleSpeed():
 			averagesSum = 0
 	toc = time.time()
 	print('elapsed time: %f' % (toc - tic))
+
+# nOTE FOR SAVE
+
 
 def analyzeEmergencyResults():
 	tic = time.time()
@@ -158,93 +160,102 @@ def analyzeEmergencyResults():
 	toc = time.time()
 	print('elapsed time: %f' % (toc - tic))
 
+# Init
 
+
+
+# Notes
+# Initialize the acceleration signals into a data structure. (LISTENER)
+# Set a bool value to turn off the car following TRUE - CAR FOLLOWING MODEL FALSE - SMART ALGO
+# Note to self:
+
+#
 # analyzeEmergencyResults()
-# analyzeAverageVehicleSpeed()
+analyzeAverageVehicleSpeed()
 
-stopTime = 2500  # stop after 700 steps
-Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
-
-vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 150, 6, 0.2) # create a listener to add vehicles
-Simulation.stepListeners.append(vehicleAdder)
-
-specialVehicleAdder = simUtilities.addSpecialVehicle(Simulation, 200)
-Simulation.stepListeners.append(specialVehicleAdder)
-
-visionLister = simUtilities.sensoredMovement(Simulation.vehicleDict, 50, lanePlacement, Simulation) # new Dodge algorithm
-Simulation.stepListeners.append(visionLister)	#add listener to your simulation
-
-emergencyListener = simUtilities.emergencyActiveListener(Simulation.vehicleDict, 500)
-Simulation.stepListeners.append(emergencyListener)
-
-boomLister = myBoomListener(Simulation.vehicleDict)  # create a listener
-Simulation.stepListeners.append(boomLister)  # add listener to your simulation
-
-# setting up the figure for animation
-fig, ax = plt.subplots()
-xdata, ydata = [], []
-ln, = plt.plot([], [], 'ro', animated=True)
-ln1, = plt.plot([],[], 'bo', animated=True)
-
-
-plt.axhline(y=lanePlacement/2, color='w', linestyle='dashed')
-plt.axhline(y=-lanePlacement/2, color='w', linestyle='dashed')
-plt.axhline(y=lanePlacement*1.5, color='black', linestyle='solid')
-plt.axhline(y=-lanePlacement*1.5, color='black', linestyle='solid')
-rectangle = plt.Rectangle((0, -0.75), width=xSimDistance, height=1.5, fill=True, color='#333333')
-rectangleBackround = plt.Rectangle((0, -2), width = xSimDistance, height=4, fill = True, color='#CCCCCC')
-rectangleBackround = plt.Rectangle((-15, -13), width = 30, height=26, fill = True, color='#CCCCCC')
+# stopTime = 2500  # stop after 700 steps
+# Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
+#
+# vehicleAdder = simUtilities.addGroupCars(Simulation.vehicleDict, Simulation.timeStep, 35, 6, 0.2) # create a listener to add vehicles
+# Simulation.stepListeners.append(vehicleAdder)
+#
+# # specialVehicleAdder = simUtilities.addSpecialVehicle(Simulation, 200)
+# # Simulation.stepListeners.append(specialVehicleAdder)
+#
+# visionLister = simUtilities.sensoredMovement(Simulation.vehicleDict, 50, lanePlacement, Simulation) # new Dodge algorithm
+# Simulation.stepListeners.append(visionLister)	#add listener to your simulation
+#
+# # emergencyListener = simUtilities.emergencyActiveListener(Simulation.vehicleDict, 100)
+# # Simulation.stepListeners.append(emergencyListener)
+#
+# boomLister = myBoomListener(Simulation.vehicleDict)  # create a listener
+# Simulation.stepListeners.append(boomLister)  # add listener to your simulation
+#
+# # setting up the figure for animation
+# fig, ax = plt.subplots()
+# xdata, ydata = [], []
+# ln, = plt.plot([], [], 'ro', animated=True)
+# ln1, = plt.plot([],[], 'bo', animated=True)
+#
+#
+# # plt.axhline(y=lanePlacement/2, color='w', linestyle='dashed')
+# # plt.axhline(y=-lanePlacement/2, color='w', linestyle='dashed')
+# # plt.axhline(y=lanePlacement*1.5, color='black', linestyle='solid')
+# # plt.axhline(y=-lanePlacement*1.5, color='black', linestyle='solid')
+# # rectangle = plt.Rectangle((0, -0.75), width=xSimDistance, height=1.5, fill=True, color='#333333')
+# # rectangleBackround = plt.Rectangle((0, -2), width = xSimDistance, height=4, fill = True, color='#CCCCCC')
+# # rectangleBackround = plt.Rectangle((-15, -13), width = 30, height=26, fill = True, color='#CCCCCC')
 # circle1 = plt.Circle((0,0), 9.75, color='w', linestyle='dashed', fill=False)
 # circle2 = plt.Circle((0,0), 8.25, color='w', linestyle='dashed', fill=False)
 # circle3 = plt.Circle((0,0), 11.25, color='black', linestyle='solid', fill=False)
 # circle4 = plt.Circle((0,0), 6.75, color='black', linestyle='solid', fill=False)
 # circleBackround = plt.Circle((0,0), 11.25, color='#333333', fill = True)
 # circleBackround2 = plt.Circle((0,0), 6.75, color='#7EC850', fill = True)
-
-# def getImage(path):
-# 	return OffsetImage(plt.imread(path))
-
-def getModifiedVehicle():  # will advance the simulation by one step and yields the vehiclelist
-		while(Simulation.step()):
-			yield Simulation.vehicleDict
-
-def init():
-	# ax.set_xlim(-15, 15)
-	# ax.set_ylim(-13, 13)
-	ax.set_xlim(0, xSimDistance+20)
-	ax.set_ylim(-2, 2)
-	ax.add_artist(rectangleBackround)
-	ax.add_artist(rectangle)
-	# ax.add_artist(circleBackround)
-	# ax.add_artist(circle1)
-	# ax.add_artist(circle2)
-	# ax.add_artist(circle3)
-	# ax.add_artist(circle4)
-	# ax.add_artist(circleBackround2)
-	return ln,
-
-def update(frame):
-	xdata, ydata = [], []
-	sXdata, sYdata = [], []
-
-	for vid, v in frame.items(): #ITERATES THROUGH EACH VEHICLE IN THE DICT
-		r = v.y * 3 + 9
-		theta = np.radians(-v.x * 360 / xSimDistance)
-		if vid == -1:
-			# sXdata.append(r*np.cos(theta))
-			# sYdata.append(r*np.sin(theta))
-			sXdata.append(v.x)
-			sYdata.append(v.y)
-			ln1.set_data(sXdata, sYdata)
-		# xdata.append(r*np.cos(theta))
-		# ydata.append(r*np.sin(theta))
-		xdata.append(v.x)
-		ydata.append(v.y)
-		# ab = AnnotationBbox(getImage('C:\Dev\emergencyVehicleProject\simUtilities\Practice\Car2.png', (v.x, v.y), frameon=False))
-		# ax.add_artist(ab)
-	ln.set_data(xdata, ydata)
-	return ln, ln1
-
-frameGenerator = getModifiedVehicle()
-ani = FuncAnimation(fig, update, frameGenerator, init_func=init, blit=True, interval = 50)
-plt.show()
+#
+# # def getImage(path):
+# # 	return OffsetImage(plt.imread(path))
+#
+# def getModifiedVehicle():  # will advance the simulation by one step and yields the vehiclelist
+# 		while(Simulation.step()):
+# 			yield Simulation.vehicleDict
+#
+# def init():
+# 	ax.set_xlim(-15, 15)
+# 	ax.set_ylim(-13, 13)
+# 	# ax.set_xlim(0, xSimDistance+20)
+# 	# ax.set_ylim(-2, 2)
+# 	# ax.add_artist(rectangleBackround)
+# 	# ax.add_artist(rectangle)
+# 	ax.add_artist(circleBackround)
+# 	ax.add_artist(circle1)
+# 	ax.add_artist(circle2)
+# 	ax.add_artist(circle3)
+# 	ax.add_artist(circle4)
+# 	ax.add_artist(circleBackround2)
+# 	return ln,
+#
+# def update(frame):
+# 	xdata, ydata = [], []
+# 	sXdata, sYdata = [], []
+#
+# 	for vid, v in frame.items(): #ITERATES THROUGH EACH VEHICLE IN THE DICT
+# 		r = v.y * 3 + 9
+# 		theta = np.radians(-v.x * 360 / xSimDistance)
+# 		if vid == -1:
+# 			sXdata.append(r*np.cos(theta))
+# 			sYdata.append(r*np.sin(theta))
+# 			# sXdata.append(v.x)
+# 			# sYdata.append(v.y)
+# 			ln1.set_data(sXdata, sYdata)
+# 		xdata.append(r*np.cos(theta))
+# 		ydata.append(r*np.sin(theta))
+# 		# xdata.append(v.x)
+# 		# ydata.append(v.y)
+# 		# ab = AnnotationBbox(getImage('C:\Dev\emergencyVehicleProject\simUtilities\Practice\Car2.png', (v.x, v.y), frameon=False))
+# 		# ax.add_artist(ab)
+# 	ln.set_data(xdata, ydata)
+# 	return ln, ln1
+#
+# frameGenerator = getModifiedVehicle()
+# ani = FuncAnimation(fig, update, frameGenerator, init_func=init, blit=True, interval = 50)
+# plt.show()
