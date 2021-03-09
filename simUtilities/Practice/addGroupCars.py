@@ -56,8 +56,6 @@ class addGroupCars():
                 elif len(self.lane3) > 0:
                     position = np.random.randint(0, len(self.lane3))
                     position = self.lane3.pop(position)
-                    if i == 4 or i == 7:
-                        print(position)
                     self.specificCarPlace(position, -lanePlacement)
                 else:
                     i = i - 1

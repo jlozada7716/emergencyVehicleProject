@@ -19,13 +19,14 @@ class simulation():
 
 	def step(self): #	will advance the simulation by one step
 		# print(self.timeStep)
-		if self.timeStep == 0 or self.timeStep == 1:
-			print('pause')
+		# if self.timeStep == 0 or self.timeStep == 1:
+		# 	print('pause')
 		self.timeStep = self.timeStep + 1
 		# 	print('current time: %d, stop time: %d'%(self.timeStep,self.stopTime))
-		if self.timeStep >= self.stopTime: 
+		if self.timeStep >= self.stopTime:
+			print("Sim Ended")
 			return False #end of simulation
-		if not np.mod(self.timeStep,100):
+		if not np.mod(self.timeStep,500):
 			print('executing time step: %d'%self.timeStep)
 		for listener in self.stepListeners:
 			listener.step()

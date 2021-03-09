@@ -49,11 +49,11 @@ def analyzeAverageVehicleSpeed():
 	tic = time.time()
 	iterationSpeedList = []	# To collect average speed within a single iteration
 	iterationSpeedAverageList = []	# To collect average speed among many iterations
-	with open('AverageSpeed_100Iterations1.csv', 'w') as out: #open file
-		for vehicles in range(30, 156, 5): #increment by 5
-			itShift = (vehicles - 20) * 100 # For seed
+	with open('AverageSpeed_100Iterations2.csv', 'w') as out: #open file
+		for vehicles in range(80, 160, 10): #increment by 10
+			itShift = (vehicles - 20) * 10 # For seed
 			print('vehicleAmount #%d' % vehicles)
-			for iteration in range(0, 100):
+			for iteration in range(0, 10):
 				print('iteration #%d' % iteration)
 				#perform Simulation
 				print("seed: ", iteration + itShift + 50000)
@@ -94,8 +94,6 @@ def analyzeAverageVehicleSpeed():
 			averagesSum = 0
 	toc = time.time()
 	print('elapsed time: %f' % (toc - tic))
-
-# nOTE FOR SAVE
 
 
 def analyzeEmergencyResults():
@@ -171,7 +169,9 @@ def analyzeEmergencyResults():
 
 #
 # analyzeEmergencyResults()
-analyzeAverageVehicleSpeed()
+# analyzeAverageVehicleSpeed()
+simUtilities.Practice.graphMaker(1/5)
+
 
 # stopTime = 2500  # stop after 700 steps
 # Simulation = simUtilities.simulation(stopTime=stopTime)  # create a simulation
